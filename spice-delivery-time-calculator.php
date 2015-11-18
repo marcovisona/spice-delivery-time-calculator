@@ -3,7 +3,7 @@
  * Plugin Name: Spice Delivery time Calculator
  * Text Domain: spice_dtc
  * Domain Path: /languages
- * Plugin URI:  http://wordpress.org/plugins/search-and-replace/
+ * Plugin URI:  https://github.com/marcovisona/spice-delivery-time-calculator
  * Description: Calcolcatore di tempi di spedizione
  * Author:      Marco Visonà
  * Author URI:  http://marcovisona.it
@@ -16,20 +16,20 @@
 
 //avoid direct calls to this file, because now WP core and framework has been used
 if ( ! function_exists( 'add_action' ) ) {
-	header( 'Status: 403 Forbidden' );
-	header( 'HTTP/1.1 403 Forbidden' );
-	exit();
+    header( 'Status: 403 Forbidden' );
+    header( 'HTTP/1.1 403 Forbidden' );
+    exit();
 }
 
 // Pre-2.6 compatibility
 if ( ! defined( 'WP_CONTENT_URL' ) ) {
-	define( 'WP_CONTENT_URL', get_option( 'siteurl' ) . '/wp-content' );
+    define( 'WP_CONTENT_URL', get_option( 'siteurl' ) . '/wp-content' );
 }
 if ( ! defined( 'WP_CONTENT_DIR' ) ) {
-	define( 'WP_CONTENT_DIR', ABSPATH . 'wp-content' );
+    define( 'WP_CONTENT_DIR', ABSPATH . 'wp-content' );
 }
 if ( ! defined( 'WP_PLUGIN_DIR' ) ) {
-	define( 'WP_PLUGIN_DIR', WP_CONTENT_DIR . '/plugins' );
+    define( 'WP_PLUGIN_DIR', WP_CONTENT_DIR . '/plugins' );
 }
 
 // plugin definitions
@@ -39,7 +39,7 @@ define( 'FB_SAR_TEXTDOMAIN', 'spice_dtc' );
 
 function spice_dtc_textdomain() {
 
-	load_plugin_textdomain( FB_SAR_TEXTDOMAIN, FALSE, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+    load_plugin_textdomain( FB_SAR_TEXTDOMAIN, FALSE, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 }
 
 add_action( 'plugins_loaded', 'spice_dtc_init' );
@@ -50,31 +50,31 @@ add_action( 'plugins_loaded', 'spice_dtc_init' );
  */
 function spice_dtc_init() {
 
-	add_action( 'admin_init', 'spice_dtc_textdomain' );
-	// add_action( 'admin_menu', 'spice_dtc_add_settings_page' );
-	// add_action( 'admin_print_scripts', 'spice_dtc_add_js_head' );
+    add_action( 'admin_init', 'spice_dtc_textdomain' );
+    // add_action( 'admin_menu', 'spice_dtc_add_settings_page' );
+    // add_action( 'admin_print_scripts', 'spice_dtc_add_js_head' );
 }
 
 //[foobar]
 function spice_dtc( $atts ){
 
-	$a = shortcode_atts( array(
-	    'shipping_time' => 24,  // in hours
-	    'threshold' => 2
-	), $atts );
+    $a = shortcode_atts( array(
+        'shipping_time' => 24,  // in hours
+        'threshold' => 2
+    ), $atts );
 
-	extract($a);
+    extract($a);
 
-	$from_date = new DateTime();
-	if (!empty($atts["from_date"])) {
-		$from_date = new DateTime($atts["from_date"]);
-	}
+    $from_date = new DateTime();
+    if (!empty($atts["from_date"])) {
+        $from_date = new DateTime($atts["from_date"]);
+    }
 
-	return calc_delivery_time($from_date, $shipping_time, $threshold);
+    return spice_compute_delivery_time($from_date, $shipping_time, $threshold);
 }
 add_shortcode( 'spice_dtc', 'spice_dtc' );
 
-function calc_delivery_time($from_date, $shipping_time, $threshold=12){
+function spice_compute_delivery_time($from_date, $shipping_time, $threshold=12){
 
     // date_default_timezone_set("Europe/Rome");
     // setlocale(LC_ALL, 'it_IT');
@@ -88,7 +88,7 @@ function calc_delivery_time($from_date, $shipping_time, $threshold=12){
     if ($nowWeekday >= 0 && $nowWeekday <= 3) {
         if ( intval($from_date->format('H')) > $threshold) {  // abbiamo superato la soglia di spedizione giornaliera
 
-
+            $shipping_time = 24 + $shipping_time;
             $thresholdDateTime->modify('1 day');
             $nowWeekday++;
         }
